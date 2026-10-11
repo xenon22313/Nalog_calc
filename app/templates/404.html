@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Страница не найдена</h1>
+<p class="lead">Такой страницы нет. Возможно, она была перемещена или адрес набран с ошибкой.</p>
+<p>Попробуйте один из калькуляторов:</p>
+<ul>
+  {% for item in calculators %}
+  <li><a href="{{ item.url }}">{{ item.h1 }}</a></li>
+  {% endfor %}
+</ul>
+<a class="btn btn-primary" href="/">На главную</a>
+{% endblock %}

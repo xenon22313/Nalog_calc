@@ -1,0 +1,80 @@
+{% set r = rates.usn_income %}
+
+{% macro fields() %}
+<div class="row g-3">
+  <div class="col-md-6">
+    <label for="income" class="form-label">Доход за год, ₽</label>
+    <input type="text" inputmode="decimal" class="form-control" id="income" name="income"
+           value="{{ calc.example.income }}">
+    <div class="invalid-feedback"></div>
+  </div>
+  <div class="col-md-6">
+    <label for="rate_percent" class="form-label">Ставка, %</label>
+    <input type="text" inputmode="decimal" class="form-control" id="rate_percent" name="rate_percent"
+           placeholder="{{ r.rate|percent }}">
+    <div class="form-text">Оставьте пустым для базовой ставки {{ r.rate|percent }}.</div>
+    <div class="invalid-feedback"></div>
+  </div>
+  <div class="col-md-6">
+    <label for="contributions" class="form-label">Уплаченные страховые взносы, ₽</label>
+    <input type="text" inputmode="decimal" class="form-control" id="contributions" name="contributions"
+           placeholder="рассчитать автоматически">
+    <div class="form-text">Если пусто — считаем взносы ИП за себя.</div>
+    <div class="invalid-feedback"></div>
+  </div>
+  <div class="col-md-6 d-flex align-items-center">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="has_employees" name="has_employees"
+             {% if calc.example.has_employees %}checked{% endif %}>
+      <label class="form-check-label" for="has_employees">Есть работники</label>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro results() %}
+<dl class="row mb-0">
+  <dt class="col-sm-7">Ставка</dt>
+  <dd class="col-sm-5" data-result="rate_percent" data-format="percent"></dd>
+  <dt class="col-sm-7">Налог до уменьшения</dt>
+  <dd class="col-sm-5" data-result="tax_before_reduction" data-format="money"></dd>
+  <dt class="col-sm-7">Взносы ИП за себя (фикс. + 1%)</dt>
+  <dd class="col-sm-5" data-result="own_contributions" data-format="money"></dd>
+  <dt class="col-sm-7">в т.ч. взнос 1% с дохода</dt>
+  <dd class="col-sm-5" data-result="extra_contribution" data-format="money"></dd>
+  <dt class="col-sm-7">Уменьшение налога на взносы</dt>
+  <dd class="col-sm-5" data-result="reduction" data-format="money"></dd>
+  <dt class="col-sm-7 fs-5">Налог к уплате</dt>
+  <dd class="col-sm-5 fs-5 fw-bold" data-result="tax_due" data-format="money"></dd>
+</dl>
+<div class="alert alert-warning mt-3 mb-0" data-show-if="over_limit" hidden>
+  Доход превышает лимит для УСН ({{ r.income_limit|money }}).
+</div>
+{% endmacro %}
+
+{% macro how() %}
+<ol>
+  <li>Налог до уменьшения = Доход × Ставка (базовая — {{ r.rate|percent }}).</li>
+  <li>
+    Взносы ИП за себя = фиксированные взносы {{ r.fixed_contributions|money }}
+    + {{ r.extra_contribution_rate|percent }} с дохода свыше {{ r.extra_contribution_threshold|money }}
+    (не более {{ r.extra_contribution_cap|money }}).
+  </li>
+  <li>
+    Налог уменьшается на уплаченные взносы: ИП без работников — полностью,
+    ИП с работниками — не более чем на {{ r.employer_reduction_cap|percent }}.
+  </li>
+</ol>
+<p class="formula">Налог к уплате = Доход × Ставка − min(Взносы, Лимит уменьшения)</p>
+<p>Лимит дохода для применения УСН — {{ r.income_limit|money }}.</p>
+{% endmacro %}
+
+{% macro example() %}
+<p>ИП без работников получил за год {{ example_input.income|money }}.</p>
+<ul>
+  <li>Налог до уменьшения: {{ example_result.tax_before_reduction|money }}</li>
+  <li>Взносы за себя: {{ example_result.own_contributions|money }} (в т.ч. 1% — {{ example_result.extra_contribution|money }})</li>
+  <li>Уменьшение: {{ example_result.reduction|money }}</li>
+  <li><strong>Налог к уплате: {{ example_result.tax_due|money }}</strong></li>
+</ul>
+{% endmacro %}

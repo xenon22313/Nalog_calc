@@ -1,0 +1,58 @@
+body {
+  background: #f7f8fa;
+}
+
+.site-logo {
+  font-size: 1.25rem;
+  color: #0d6efd;
+}
+
+.nav-link-plain {
+  color: #212529;
+  text-decoration: none;
+}
+
+.nav-link-plain:hover {
+  color: #0d6efd;
+}
+
+main h2 {
+  font-size: 1.5rem;
+}
+
+.calc-card {
+  color: inherit;
+  transition: box-shadow 0.15s;
+}
+
+.calc-card:hover {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+}
+
+.calc-results.is-loading {
+  opacity: 0.6;
+}
+
+.formula {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  background: #fff;
+  border-left: 3px solid #0d6efd;
+  padding: 0.5rem 0.75rem;
+}
+
+.faq-item {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.article-body {
+  max-width: 48rem;
+}

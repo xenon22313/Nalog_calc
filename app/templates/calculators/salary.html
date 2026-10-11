@@ -1,0 +1,56 @@
+{% set r = rates.ndfl %}
+
+{% macro fields() %}
+<div class="row g-3">
+  <div class="col-md-6">
+    <label for="gross_monthly" class="form-label">Зарплата до вычета НДФЛ (в месяц), ₽</label>
+    <input type="text" inputmode="decimal" class="form-control" id="gross_monthly" name="gross_monthly"
+           value="{{ calc.example.gross_monthly }}">
+    <div class="invalid-feedback"></div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro results() %}
+<dl class="row mb-0">
+  <dt class="col-sm-7">Доход за год</dt>
+  <dd class="col-sm-5" data-result="gross_year" data-format="money"></dd>
+  <dt class="col-sm-7">НДФЛ за год</dt>
+  <dd class="col-sm-5" data-result="ndfl_year" data-format="money"></dd>
+  <dt class="col-sm-7">На руки за год</dt>
+  <dd class="col-sm-5" data-result="net_year" data-format="money"></dd>
+  <dt class="col-sm-7">НДФЛ в месяц (в среднем)</dt>
+  <dd class="col-sm-5" data-result="ndfl_month" data-format="money"></dd>
+  <dt class="col-sm-7">Эффективная ставка</dt>
+  <dd class="col-sm-5" data-result="effective_rate" data-format="percent"></dd>
+  <dt class="col-sm-7 fs-5">На руки в месяц (в среднем)</dt>
+  <dd class="col-sm-5 fs-5 fw-bold" data-result="net_month" data-format="money"></dd>
+</dl>
+{% endmacro %}
+
+{% macro how() %}
+<p>НДФЛ считается по прогрессивной шкале от годового дохода (зарплата × 12):</p>
+<table class="table table-sm w-auto">
+  <thead><tr><th>Годовой доход</th><th>Ставка на эту часть</th></tr></thead>
+  <tbody>
+  {% set ns = namespace(lower=0) %}
+  {% for upper, rate in r.brackets %}
+    <tr>
+      <td>{% if upper %}от {{ ns.lower|money }} до {{ upper|money }}{% else %}свыше {{ ns.lower|money }}{% endif %}</td>
+      <td>{{ rate|percent }}</td>
+    </tr>
+    {% set ns.lower = upper %}
+  {% endfor %}
+  </tbody>
+</table>
+<p class="formula">На руки = Зарплата × 12 − НДФЛ по шкале; в месяц — результат ÷ 12</p>
+{% endmacro %}
+
+{% macro example() %}
+<p>Зарплата {{ example_input.gross_monthly|money }} в месяц, доход за год — {{ example_result.gross_year|money }}.</p>
+<ul>
+  <li>НДФЛ за год: {{ example_result.ndfl_year|money }}</li>
+  <li>НДФЛ в месяц: {{ example_result.ndfl_month|money }}</li>
+  <li><strong>На руки в месяц: {{ example_result.net_month|money }}</strong></li>
+</ul>
+{% endmacro %}

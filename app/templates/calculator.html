@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% import calc.template as part with context %}
+<h1 class="mb-2">{{ calc.h1 }}</h1>
+<p class="lead">{{ calc.description }}</p>
+
+<form class="calc-form card card-body mb-3" data-slug="{{ calc.slug }}" data-results="calc-results" novalidate>
+  {{ part.fields() }}
+  <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+    <button type="submit" class="btn btn-primary">Рассчитать</button>
+    <div class="form-check mb-0">
+      <input class="form-check-input" type="checkbox" id="auto-recalc" data-auto-toggle>
+      <label class="form-check-label" for="auto-recalc">Пересчитывать автоматически</label>
+    </div>
+  </div>
+  <div class="alert alert-danger mt-3 mb-0 calc-error" role="alert" hidden></div>
+</form>
+
+<section id="calc-results" class="card card-body mb-3 calc-results" aria-live="polite" hidden>
+  <h2 class="h5">Результат расчёта</h2>
+  {{ part.results() }}
+</section>
+
+<p class="small text-muted mb-1">Расчёт справочный и не является налоговой консультацией.</p>
+<p class="small text-muted">Ставки и лимиты обновлены: <time datetime="{{ rates_updated.isoformat() }}">{{ rates_updated|ru_date }}</time></p>
+
+{% if settings.RSYA_BLOCK_ID %}
+<div class="my-4" id="yandex_rtb_{{ settings.RSYA_BLOCK_ID }}"></div>
+<script>window.yaContextCb = window.yaContextCb || []</script>
+<script src="https://yandex.ru/ads/system/context.js" async></script>
+<script>
+  window.yaContextCb.push(function () {
+    Ya.Context.AdvManager.render({blockId: {{ settings.RSYA_BLOCK_ID|tojson }}, renderTo: {{ ('yandex_rtb_' ~ settings.RSYA_BLOCK_ID)|tojson }}});
+  });
+</script>
+{% endif %}
+
+<section class="mt-4">
+  <h2>Как считается</h2>
+  {{ part.how() }}
+</section>
+
+<section class="mt-4">
+  <h2>Пример расчёта</h2>
+  {{ part.example() }}
+</section>
+
+{% if calc.faq %}
+<section class="mt-4">
+  <h2>Частые вопросы</h2>
+  {% for question, answer in calc.faq %}
+  <details class="faq-item">
+    <summary>{{ question }}</summary>
+    <p class="mb-0 mt-2">{{ answer }}</p>
+  </details>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if related %}
+<section class="mt-4">
+  <h2>Другие калькуляторы</h2>
+  <ul>
+    {% for item in related %}
+    <li><a href="{{ item.url }}">{{ item.h1 }}</a> — {{ item.short }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ static_url('js/calc.js') }}" defer></script>
+{% endblock %}

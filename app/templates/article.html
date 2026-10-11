@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="article-body">
+  <h1>{{ article.h1 }}</h1>
+  <p class="small text-muted">Обновлено: <time datetime="{{ article.updated.isoformat() }}">{{ article.updated|ru_date }}</time></p>
+  {% include article.template %}
+</article>
+
+<section class="mt-5">
+  <h2 class="h4">Калькуляторы</h2>
+  <ul>
+    {% for item in calculators %}
+    <li><a href="{{ item.url }}">{{ item.h1 }}</a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

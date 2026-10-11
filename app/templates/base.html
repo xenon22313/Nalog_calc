@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ description }}">
+  {% if calc and calc.keywords %}<meta name="keywords" content="{{ calc.keywords }}">{% endif %}
+  {% if noindex %}<meta name="robots" content="noindex">{% else %}<link rel="canonical" href="{{ canonical }}">{% endif %}
+
+  <meta property="og:type" content="{{ og_type or 'website' }}">
+  <meta property="og:site_name" content="{{ settings.SITE_NAME }}">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:url" content="{{ canonical }}">
+
+  <link rel="stylesheet" href="{{ static_url('vendor/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('css/site.css') }}">
+
+  {% for item in json_ld or [] %}
+  <script type="application/ld+json">{{ item|tojson }}</script>
+  {% endfor %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <header class="border-bottom bg-white">
+    <nav class="container d-flex flex-wrap align-items-center gap-3 py-2" aria-label="Основное меню">
+      <a class="site-logo fw-bold text-decoration-none me-auto" href="/">{{ settings.SITE_NAME }}</a>
+      {% for item in calculators %}
+      <a class="nav-link-plain" href="{{ item.url }}">{{ item.menu or item.h1 }}</a>
+      {% endfor %}
+    </nav>
+  </header>
+
+  <main class="container py-4 flex-grow-1">
+    {% if crumbs %}
+    <nav aria-label="Хлебные крошки">
+      <ol class="breadcrumb small">
+        {% for name, url in crumbs %}
+          {% if loop.last %}
+          <li class="breadcrumb-item active" aria-current="page">{{ name }}</li>
+          {% else %}
+          <li class="breadcrumb-item"><a href="{{ url }}">{{ name }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </nav>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="border-top bg-light py-4 small text-muted">
+    <div class="container d-flex flex-wrap justify-content-between gap-2">
+      <span>&copy; {{ settings.SITE_NAME }}. Расчёты носят справочный характер.</span>
+      <a href="/privacy">Политика конфиденциальности</a>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+
+  {% if settings.METRIKA_ID %}
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+    ym({{ settings.METRIKA_ID|tojson }}, "init", {clickmap: true, trackLinks: true, accurateTrackBounce: true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/{{ settings.METRIKA_ID }}" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+  {% endif %}
+</body>
+</html>

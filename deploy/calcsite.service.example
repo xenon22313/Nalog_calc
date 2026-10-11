@@ -1,0 +1,25 @@
+# /etc/systemd/system/calcsite.service
+# Enable: sudo systemctl daemon-reload && sudo systemctl enable --now calcsite
+
+[Unit]
+Description=Calculator site (FastAPI + uvicorn)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/calcsite
+Environment=SITE_URL=https://example.ru
+Environment=SITE_NAME=НалогКальк
+Environment=TRUST_PROXY_HEADERS=1
+# Environment=METRIKA_ID=12345678
+# Environment=RSYA_BLOCK_ID=R-A-123456-1
+# One worker: the API rate limiter keeps its state in process memory.
+ExecStart=/srv/calcsite/.venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 --port 8000 --workers 1 \
+    --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

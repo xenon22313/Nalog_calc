@@ -1,0 +1,71 @@
+{% set r = rates.npd %}
+
+{% macro fields() %}
+<div class="row g-3">
+  <div class="col-md-4">
+    <label for="income_individuals" class="form-label">Доход от физлиц, ₽</label>
+    <input type="text" inputmode="decimal" class="form-control" id="income_individuals" name="income_individuals"
+           value="{{ calc.example.income_individuals }}">
+    <div class="invalid-feedback"></div>
+  </div>
+  <div class="col-md-4">
+    <label for="income_legal" class="form-label">Доход от компаний и ИП, ₽</label>
+    <input type="text" inputmode="decimal" class="form-control" id="income_legal" name="income_legal"
+           value="{{ calc.example.income_legal }}">
+    <div class="invalid-feedback"></div>
+  </div>
+  <div class="col-md-4">
+    <label for="deduction_left" class="form-label">Остаток вычета, ₽</label>
+    <input type="text" inputmode="decimal" class="form-control" id="deduction_left" name="deduction_left"
+           value="{{ calc.example.deduction_left }}">
+    <div class="form-text">Смотрите в приложении «Мой налог». Максимум {{ r.deduction_total|money }}.</div>
+    <div class="invalid-feedback"></div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro results() %}
+<dl class="row mb-0">
+  <dt class="col-sm-7">Налог с доходов от физлиц</dt>
+  <dd class="col-sm-5" data-result="tax_individuals" data-format="money"></dd>
+  <dt class="col-sm-7">Налог с доходов от компаний и ИП</dt>
+  <dd class="col-sm-5" data-result="tax_legal" data-format="money"></dd>
+  <dt class="col-sm-7">Использовано вычета</dt>
+  <dd class="col-sm-5" data-result="deduction_used" data-format="money"></dd>
+  <dt class="col-sm-7">Остаток вычета</dt>
+  <dd class="col-sm-5" data-result="deduction_left_after" data-format="money"></dd>
+  <dt class="col-sm-7 fs-5">Налог к уплате</dt>
+  <dd class="col-sm-5 fs-5 fw-bold" data-result="tax_total" data-format="money"></dd>
+</dl>
+<div class="alert alert-warning mt-3 mb-0" data-show-if="over_limit" hidden>
+  Доход превышает годовой лимит для самозанятых ({{ r.annual_income_limit|money }}).
+</div>
+{% endmacro %}
+
+{% macro how() %}
+<p>Налог считается отдельно по доходам от физических лиц и от компаний или ИП:</p>
+<ul>
+  <li>доходы от физлиц облагаются по ставке {{ r.rate_individuals|percent }};</li>
+  <li>доходы от компаний и ИП — по ставке {{ r.rate_legal|percent }}.</li>
+</ul>
+<p>
+  Пока не израсходован налоговый вычет ({{ r.deduction_total|money }}), ставки снижаются:
+  на {{ r.deduction_rate_individuals|percent }} для доходов от физлиц
+  и на {{ r.deduction_rate_legal|percent }} для доходов от компаний.
+</p>
+<p class="formula">Налог = Доход × Ставка − min(Доход × Снижение ставки, Остаток вычета)</p>
+<p>Годовой лимит дохода — {{ r.annual_income_limit|money }}.</p>
+{% endmacro %}
+
+{% macro example() %}
+<p>
+  Самозанятый получил {{ example_input.income_individuals|money }} от физлиц
+  и {{ example_input.income_legal|money }} от компаний, остаток вычета — {{ example_input.deduction_left|money }}.
+</p>
+<ul>
+  <li>Налог с доходов от физлиц: {{ example_result.tax_individuals|money }}</li>
+  <li>Налог с доходов от компаний: {{ example_result.tax_legal|money }}</li>
+  <li>Использовано вычета: {{ example_result.deduction_used|money }}</li>
+  <li><strong>Итого к уплате: {{ example_result.tax_total|money }}</strong></li>
+</ul>
+{% endmacro %}

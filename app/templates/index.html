@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="mb-3">Онлайн-калькуляторы налогов</h1>
+<p class="lead mb-4">
+  Бесплатные калькуляторы для самозанятых, индивидуальных предпринимателей и сотрудников.
+  Считайте налоги и доход на руки за пару секунд.
+</p>
+
+<h2 class="h4 mb-3">Калькуляторы</h2>
+<div class="row g-3 mb-5">
+  {% for item in calculators %}
+  <div class="col-md-4">
+    <a class="card h-100 text-decoration-none calc-card" href="{{ item.url }}">
+      <div class="card-body">
+        <h3 class="h5 card-title">{{ item.h1 }}</h3>
+        <p class="card-text text-muted mb-0">{{ item.short }}</p>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+{% if articles %}
+<h2 class="h4 mb-3">Статьи</h2>
+<ul>
+  {% for article in articles %}
+  <li><a href="{{ article.url }}">{{ article.h1 }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
